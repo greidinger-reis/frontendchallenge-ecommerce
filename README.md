@@ -6,7 +6,6 @@
 - [Next.js](https://nextjs.org/)
 - [Typescript](https://www.typescriptlang.org/)
 - [TailwindCSS](https://tailwindcss.com/)
-- [TRPC](https://trpc.io/)
 
 ### How to run:
 
