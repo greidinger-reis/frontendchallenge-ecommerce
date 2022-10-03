@@ -1,30 +1,31 @@
+import { useAtom } from "jotai";
 import { CaretLeft, CaretRight } from "phosphor-react";
-import { useState } from "react";
+import { quantityAtom } from "../BuyItemModal";
 
 export const NumberInput = () => {
-  const [value, setValue] = useState(1);
+  const [quantity, setQuantity] = useAtom(quantityAtom);
 
   return (
     <div className="flex w-fit overflow-hidden rounded">
       <button
         className="bg-orange-500 px-2 py-1 text-white hover:bg-orange-600"
         onClick={() => {
-          if (value > 1) {
-            setValue(value - 1);
+          if (quantity > 1) {
+            setQuantity(quantity - 1);
           }
         }}
       >
         <CaretLeft size={24} />
       </button>
       <input
-        value={value}
+        value={quantity}
         type="number"
         className="w-10 bg-white text-center outline-none"
       />
       <button
         className="bg-orange-500 px-2 py-1 text-white hover:bg-orange-600"
         onClick={() => {
-          setValue(value + 1);
+          setQuantity(quantity + 1);
         }}
       >
         <CaretRight size={24} />

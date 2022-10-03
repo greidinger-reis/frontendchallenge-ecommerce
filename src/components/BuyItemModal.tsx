@@ -1,13 +1,58 @@
-import { Fragment, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ShoppingCart } from "phosphor-react";
 import { Product } from "@/types/product";
 import Image from "next/future/image";
 import { Button } from "./UI/Button";
 import { NumberInput } from "./UI/NumberInput";
+import { atom, useAtom } from "jotai";
+
+export const quantityAtom = atom(1);
+export const sizeAtom = atom("");
+export const productNameAtom = atom("");
+export const unitPriceAtom = atom(0);
+
+export interface IProductToShoppingCart {
+  productName: string;
+  unitPrice: number;
+  quantity: number;
+  size: string;
+}
 
 export const BuyItemModal: React.FC<{ product: Product }> = ({ product }) => {
+  const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [quantity, setQuantity] = useAtom(quantityAtom);
+  const [size, setSize] = useAtom(sizeAtom);
+  const [productName, setProductName] = useAtom(productNameAtom);
+  const [unitPrice, setUnitPrice] = useAtom(unitPriceAtom);
+  const parsedPriceString = product.actual_price
+    .split(" ")[1]
+    ?.replace(",", ".");
+
+  const isSizeSelected = size !== "";
+
+  const handleBuyNow = () => {
+    if (!isSizeSelected) {
+      setError("Selecione um tamanho");
+    }
+    console.log("Buyed product:", {
+      productName,
+      unitPrice,
+      quantity,
+      size,
+    });
+  };
+
+  // when the modal is open, set the product name and unit price, and reset the quantity and size
+  useEffect(() => {
+    setError("");
+    setProductName(product.name);
+    setUnitPrice(parseFloat(parsedPriceString || "0"));
+    setSize("");
+    setQuantity(1);
+  }, [isOpen]);
 
   return (
     <>
@@ -49,48 +94,74 @@ export const BuyItemModal: React.FC<{ product: Product }> = ({ product }) => {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="flex gap-4 rounded bg-white p-4 drop-shadow">
-                <div>
+                <div className="left-side">
                   <Image
                     alt={product.name}
                     src={product.image}
                     width={200}
                     height={200}
                   />
-                  <Dialog.Title className="text-center text-lg font-bold text-zinc-600">
+                  <Dialog.Title className="text-center mt-3 text-lg font-bold text-zinc-600">
                     {product.name
                       .toLowerCase()
                       .replace(/( |^)[a-z]/g, (L) => L.toUpperCase())}
                   </Dialog.Title>
                 </div>
-                <div className="flex max-w-[200px] flex-col">
+                <div className="right-side flex max-w-[200px] flex-col">
                   <div className="flex flex-col gap-2">
-                    <strong className="text-zinc-600">Tamanho</strong>
-                    <div className="flex gap-1">
-                      {product.sizes.map((size) => (
-                        <label
-                          htmlFor={`size-${size.size}`}
-                          key={`size-${size.size}`}
-                          className="min-w-[32px] cursor-pointer rounded border border-orange-500 py-1 text-center text-orange-500"
-                        >
-                          <input
-                            type="checkbox"
-                            className="hidden"
-                            name={`size-${size.size}`}
-                          />
-                          {size.size}
-                        </label>
-                      ))}
+                    <div className="sizes flex flex-col gap-2">
+                      <strong className="text-zinc-600">Tamanho</strong>
+                      <div className="sizes-radio flex gap-1">
+                        {product.sizes.map((size) => (
+                          <div className="flex" key={size.size}>
+                            <input
+                              id={`size-${size.size}`}
+                              name="size"
+                              type="radio"
+                              className="hidden peer"
+                              value={size.size}
+                              onChange={({ target }) => setSize(target.value)}
+                            />
+                            <label
+                              htmlFor={`size-${size.size}`}
+                              className="min-w-[32px] cursor-pointer rounded border border-orange-500 py-1 text-center text-orange-500 peer-checked:bg-orange-500 peer-checked:text-white"
+                            >
+                              {size.size}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {error !== "" && (
+                        <span className="text-red-500 -mt-2">{error}</span>
+                      )}
                     </div>
-                    <strong className="text-zinc-600">Quantidade</strong>
-                    <NumberInput />
-                  </div>
-                  <div className="mt-auto flex flex-col gap-2">
-                    <Button className="bg-orange-500 hover:bg-orange-600">
-                      Comprar agora
-                    </Button>
-                    <Button className="bg-zinc-500 text-sm hover:bg-zinc-600">
-                      Adicionar ao carrinho e continuar comprando
-                    </Button>
+                    <div className="quantity-input flex flex-col gap-2">
+                      <strong className="text-zinc-600">Quantidade</strong>
+                      <NumberInput />
+                    </div>
+                    <div className="total-price-label flex flex-col">
+                      <strong className="font-bold text-zinc-600">
+                        Preço total
+                      </strong>
+                      <span className="font-bold text-2xl text-zinc-600">
+                        R${" "}
+                        {(
+                          quantity * parseFloat(parsedPriceString || "0")
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="button-group mt-auto flex flex-col gap-2">
+                      <Button
+                        className="bg-orange-500 hover:bg-orange-600"
+                        type="submit"
+                        onClick={() => handleBuyNow()}
+                      >
+                        Comprar agora
+                      </Button>
+                      <Button className="bg-zinc-500 text-sm hover:bg-zinc-600">
+                        Adicionar ao carrinho e continuar comprando
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Dialog.Panel>
