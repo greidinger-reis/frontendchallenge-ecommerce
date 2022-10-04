@@ -6,6 +6,8 @@
 - [Next.js](https://nextjs.org/)
 - [Typescript](https://www.typescriptlang.org/)
 - [TailwindCSS](https://tailwindcss.com/)
+- [React Query](https://react-query.tanstack.com/)
+- [Jotai](https://jotai.org/)
 
 ### How to run:
 

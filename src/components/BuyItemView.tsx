@@ -10,6 +10,7 @@ import { atom, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
+import { parsePriceString } from "@/utils/parsePrise";
 
 export const quantityAtom = atom(1);
 export const sizeAtom = atom("");
@@ -42,9 +43,6 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
   const router = useRouter();
 
   const isSizeSelected = size !== "";
-  const parsedPriceString = product.actual_price
-    .split(" ")[1]
-    ?.replace(",", ".");
 
   const handleAddItemToCart = async () => {
     if (!isSizeSelected) {
@@ -74,7 +72,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
   useEffect(() => {
     setError("");
     setProductName(product.name);
-    setUnitPrice(parseFloat(parsedPriceString || "0"));
+    setUnitPrice(parsePriceString(product.actual_price));
     setSize("");
     setQuantity(1);
   }, [isOpen]);
@@ -171,7 +169,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
                       <span className="font-bold text-2xl text-zinc-600">
                         R${" "}
                         {(
-                          quantity * parseFloat(parsedPriceString || "0")
+                          quantity * parsePriceString(product.actual_price)
                         ).toFixed(2)}
                       </span>
                     </div>
