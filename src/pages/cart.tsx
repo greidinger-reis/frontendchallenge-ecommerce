@@ -13,14 +13,20 @@ const ShoppingCartPage = () => {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
       {shoppingCart.length > 0 ? (
-        <ul>
-          {shoppingCart.map((item) => (
-            <CartItem key={item.orderId} item={item} />
-          ))}
-        </ul>
+        <div className="w-full flex justify-center gap-4 p-8 relative">
+          <ul className="w-3/4 bg-white rounded drop-shadow p-4">
+            <h1 className="text-2xl font-bold text-center">Produtos</h1>
+            {shoppingCart.map((item) => (
+              <CartItem key={item.orderId} item={item} />
+            ))}
+          </ul>
+          <div className="w-1/4 relative">
+            <CartTotal />
+          </div>
+        </div>
       ) : (
         <div>
-          <h1 className="text-xl">Seu carrinho está vazio</h1>
+          <h2 className="text-xl">Seu carrinho está vazio</h2>
           <Link href="/">
             <Button className="bg-orange-500 hover:bg-orange-600 mx-auto mt-2">
               Ir para produtos
@@ -69,6 +75,25 @@ const CartItem: React.FC<{ item: IProductToShoppingCart }> = ({ item }) => {
         Remover <X className="mt-1" />
       </Button>
     </li>
+  );
+};
+
+const CartTotal = () => {
+  const [shoppingCart] = useAtom(shoppingCartAtom);
+  return (
+    <div className="fixed h-80 w-96 flex flex-col bg-white rounded drop-shadow p-4">
+      <h1>Resumo</h1>
+      <p>
+        Total: R${" "}
+        {shoppingCart.reduce(
+          (acc, item) => acc + item.unitPrice * item.quantity,
+          0
+        )}
+      </p>
+      <Button className="bg-orange-500 hover:bg-orange-600">
+        Finalizar compra
+      </Button>
+    </div>
   );
 };
 
