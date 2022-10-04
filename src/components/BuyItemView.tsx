@@ -7,42 +7,67 @@ import Image from "next/future/image";
 import { Button } from "./UI/Button";
 import { NumberInput } from "./UI/NumberInput";
 import { atom, useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
 
 export const quantityAtom = atom(1);
 export const sizeAtom = atom("");
 export const productNameAtom = atom("");
 export const unitPriceAtom = atom(0);
+export const shoppingCartAtom = atomWithStorage<IProductToShoppingCart[]>(
+  "shoppingCart",
+  []
+);
 
 export interface IProductToShoppingCart {
+  orderId: string;
   productName: string;
+  image: string;
   unitPrice: number;
   quantity: number;
   size: string;
 }
 
-export const BuyItemModal: React.FC<{ product: Product }> = ({ product }) => {
+export const BuyItemModalView: React.FC<{ product: Product }> = ({
+  product,
+}) => {
+  const [, setShoppingCart] = useAtom(shoppingCartAtom);
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [quantity, setQuantity] = useAtom(quantityAtom);
   const [size, setSize] = useAtom(sizeAtom);
   const [productName, setProductName] = useAtom(productNameAtom);
   const [unitPrice, setUnitPrice] = useAtom(unitPriceAtom);
+  const router = useRouter();
+
+  const isSizeSelected = size !== "";
   const parsedPriceString = product.actual_price
     .split(" ")[1]
     ?.replace(",", ".");
 
-  const isSizeSelected = size !== "";
-
-  const handleBuyNow = () => {
+  const handleAddItemToCart = async () => {
     if (!isSizeSelected) {
       setError("Selecione um tamanho");
+      return Promise.reject();
     }
-    console.log("Buyed product:", {
+
+    const image = product.image;
+    const orderId = uuidv4();
+
+    const productToShoppingCart: IProductToShoppingCart = {
+      orderId,
+      image,
       productName,
       unitPrice,
       quantity,
       size,
-    });
+    };
+
+    setShoppingCart((prev) => [...prev, productToShoppingCart]);
+    setIsOpen(false);
+
+    return Promise.resolve(productToShoppingCart);
   };
 
   // when the modal is open, set the product name and unit price, and reset the quantity and size
@@ -153,12 +178,18 @@ export const BuyItemModal: React.FC<{ product: Product }> = ({ product }) => {
                     <div className="button-group mt-auto flex flex-col gap-2">
                       <Button
                         className="bg-orange-500 hover:bg-orange-600"
-                        type="submit"
-                        onClick={() => handleBuyNow()}
+                        onClick={() => {
+                          handleAddItemToCart().then(() =>
+                            router.push("/cart")
+                          );
+                        }}
                       >
                         Comprar agora
                       </Button>
-                      <Button className="bg-zinc-500 text-sm hover:bg-zinc-600">
+                      <Button
+                        className="bg-zinc-500 text-sm hover:bg-zinc-600"
+                        onClick={() => handleAddItemToCart()}
+                      >
                         Adicionar ao carrinho e continuar comprando
                       </Button>
                     </div>

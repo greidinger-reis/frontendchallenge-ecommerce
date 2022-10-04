@@ -3,14 +3,16 @@ import type { Product } from "@/types/product";
 import { slugify } from "@/utils/slugify";
 import Image from "next/future/image";
 import { CaretDown } from "phosphor-react";
-import { BuyItemModal } from "./BuyItemModal";
+import { BuyItemModalView } from "./BuyItemView";
 import { Spinner } from "./UI/Spinner";
 
 export const ProductView = () => {
   const { data, isError, isLoading } = useProductQuery();
   return (
     <>
-      <h1 className="mb-4 text-center text-4xl font-extrabold">Produtos</h1>
+      <h1 className="mb-4 text-center text-4xl font-extrabold text-zinc-600">
+        Produtos
+      </h1>
       {isLoading && (
         <div className="h-[90vh] w-full flex items-center justify-center">
           <Spinner />
@@ -48,7 +50,9 @@ const ProductCard = ({ product }: { product: Product }) => {
           className="rounded"
         />
         <div className="flex w-full flex-col p-2">
-          <strong className="text-lg font-bold">{product.name}</strong>
+          <strong className="text-lg font-bold text-zinc-800">
+            {product.name}
+          </strong>
           {product.actual_price !== product.regular_price ? (
             <>
               <div>
@@ -66,7 +70,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             </span>
           )}
           <span>{product.installments}</span>
-          <BuyItemModal product={product} />
+          <BuyItemModalView product={product} />
         </div>
       </div>
     </li>

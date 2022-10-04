@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { CaretLeft, CaretRight } from "phosphor-react";
-import { quantityAtom } from "../BuyItemModal";
+import { quantityAtom } from "../BuyItemView";
 
 export const NumberInput = () => {
   const [quantity, setQuantity] = useAtom(quantityAtom);
