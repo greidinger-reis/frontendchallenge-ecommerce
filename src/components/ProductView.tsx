@@ -1,32 +1,24 @@
 import { useProductQuery } from "@/hooks/useProductQuery";
 import type { Product } from "@/types/product";
 import { parsePriceString } from "@/utils/parsePrise";
+import { Popover, Transition } from "@headlessui/react";
+import { atom, useAtom } from "jotai";
 import Image from "next/future/image";
 import { ArrowsDownUp, CaretDown } from "phosphor-react";
-import { FormEvent, useState } from "react";
+import { Fragment, useState } from "react";
 import { BuyItemModalView } from "./BuyItemView";
 import { Spinner } from "./UI/Spinner";
 
+export const selectedSortAtom = atom<AvailableSorts>("discount");
+
 export const ProductView = () => {
   const { data, isError, isLoading } = useProductQuery();
-  const [selectedSort, setSelectedSort] = useState<AvailableSorts>("discount");
+  const [selectedSort] = useAtom(selectedSortAtom);
 
   return (
     <>
-      <div className="flex items-center justify-center">
-        <div className="mb-4 flex items-center gap-1">
-          <ArrowsDownUp size={20} className="text-orange-500" />
-          <span className="text-lg font-bold">Ordernar: </span>
-          <select
-            onChange={(e: FormEvent<HTMLSelectElement>) =>
-              setSelectedSort(e.currentTarget.value as AvailableSorts)
-            }
-          >
-            <option value="discount">% de desconto</option>
-            <option value="priceAsc">Preço crescente</option>
-            <option value="priceDesc">Preço decrescente</option>
-          </select>
-        </div>
+      <div className="flex items-center">
+        <SortList />
       </div>
       {isLoading && (
         <div className="flex h-[90vh] w-full items-center justify-center">
@@ -35,7 +27,7 @@ export const ProductView = () => {
       )}
       {isError && <div>Error</div>}
       {data && data.products.length > 0 && (
-        <ul className="flex flex-wrap gap-4">
+        <ul className="flex flex-wrap justify-center gap-4">
           {data.products.sort(sortFunctions[selectedSort]).map((product, i) => (
             <ProductCard key={`${product.name}#${i}`} product={product} />
           ))}
@@ -94,6 +86,65 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
       </div>
     </li>
+  );
+};
+
+const SortList = () => {
+  const [, setSelectedSort] = useAtom(selectedSortAtom);
+  const [currentSort, setCurrentSort] = useState("% de desconto");
+
+  return (
+    <Popover className="relative flex gap-2">
+      <div className="mt-2 flex font-bold">
+        <ArrowsDownUp className="text-orange-500" size={24} />
+        Ordernar:
+      </div>
+      <Popover.Button className="mb-4 flex w-48 items-center justify-between rounded bg-white px-4 py-2">
+        {currentSort}
+        <CaretDown size={20} />
+      </Popover.Button>
+      <Transition
+        as={Fragment}
+        enter="transition duration-100 ease-out"
+        enterFrom="transform scale-95 opacity-0"
+        enterTo="transform scale-100 opacity-100"
+        leave="transition duration-75 ease-out"
+        leaveFrom="transform scale-100 opacity-100"
+        leaveTo="transform scale-95 opacity-0"
+      >
+        <Popover.Panel className="absolute top-12 right-0 z-10 rounded bg-white py-4 drop-shadow-lg">
+          <ul className="w-48">
+            <li
+              className="px-4 py-2 hover:bg-zinc-400 hover:text-white"
+              onClick={() => {
+                setCurrentSort("% de desconto");
+                setSelectedSort("discount");
+              }}
+            >
+              % de desconto
+            </li>
+            <li
+              className="px-4 py-2 hover:bg-zinc-400 hover:text-white"
+              onClick={() => {
+                setCurrentSort("Preço crescente");
+                setSelectedSort("priceAsc");
+              }}
+            >
+              Preço crescente
+            </li>
+            <li
+              className="px-4 py-2 hover:bg-zinc-400 hover:text-white"
+              onClick={() => {
+                setCurrentSort("Preço decrescente");
+                setSelectedSort("priceDesc");
+              }}
+            >
+              Preço decrescente
+            </li>
+          </ul>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
   );
 };
 
