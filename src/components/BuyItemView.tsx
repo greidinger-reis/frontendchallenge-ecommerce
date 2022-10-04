@@ -11,6 +11,7 @@ import { atomWithStorage } from "jotai/utils";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { parsePriceString } from "@/utils/parsePrise";
+import { SizeButtons } from "./SizeButtons";
 
 export const quantityAtom = atom(1);
 export const sizeAtom = atom("");
@@ -106,7 +107,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
               aria-hidden="true"
             />
           </Transition.Child>
-          <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="fixed inset-0 flex items-end justify-center sm:items-center sm:p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -116,7 +117,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flex gap-4 rounded bg-white p-4 drop-shadow">
+              <Dialog.Panel className="flex gap-4 bg-white p-4 drop-shadow sm:rounded">
                 <div className="left-side">
                   <Image
                     alt={product.name}
@@ -124,7 +125,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
                     width={200}
                     height={200}
                   />
-                  <Dialog.Title className="text-center mt-3 text-lg font-bold text-zinc-600">
+                  <Dialog.Title className="mt-3 text-center text-lg font-bold text-zinc-600">
                     {product.name
                       .toLowerCase()
                       .replace(/( |^)[a-z]/g, (L) => L.toUpperCase())}
@@ -135,27 +136,10 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
                     <div className="sizes flex flex-col gap-2">
                       <strong className="text-zinc-600">Tamanho</strong>
                       <div className="sizes-radio flex gap-1">
-                        {product.sizes.map((size) => (
-                          <div className="flex" key={size.size}>
-                            <input
-                              id={`size-${size.size}`}
-                              name="size"
-                              type="radio"
-                              className="hidden peer"
-                              value={size.size}
-                              onChange={({ target }) => setSize(target.value)}
-                            />
-                            <label
-                              htmlFor={`size-${size.size}`}
-                              className="min-w-[32px] cursor-pointer rounded border border-orange-500 py-1 text-center text-orange-500 peer-checked:bg-orange-500 peer-checked:text-white"
-                            >
-                              {size.size}
-                            </label>
-                          </div>
-                        ))}
+                        <SizeButtons sizes={product.sizes} />
                       </div>
                       {error !== "" && (
-                        <span className="text-red-500 -mt-2">{error}</span>
+                        <span className="-mt-2 text-red-500">{error}</span>
                       )}
                     </div>
                     <div className="quantity-input flex flex-col gap-2">
@@ -166,7 +150,7 @@ export const BuyItemModalView: React.FC<{ product: Product }> = ({
                       <strong className="font-bold text-zinc-600">
                         Preço total
                       </strong>
-                      <span className="font-bold text-2xl text-zinc-600">
+                      <span className="text-2xl font-bold text-zinc-600">
                         R${" "}
                         {(
                           quantity * parsePriceString(product.actual_price)

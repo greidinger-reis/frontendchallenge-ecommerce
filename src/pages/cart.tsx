@@ -11,16 +11,16 @@ import { X } from "phosphor-react";
 const ShoppingCartPage = () => {
   const [shoppingCart] = useAtom(shoppingCartAtom);
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
       {shoppingCart.length > 0 ? (
-        <div className="w-full flex justify-center gap-4 p-8 relative">
-          <ul className="w-3/4 bg-white rounded drop-shadow p-4">
-            <h1 className="text-2xl font-bold text-center">Produtos</h1>
+        <div className="relative flex w-full justify-center gap-4 p-8">
+          <ul className="w-3/4 rounded bg-white p-4 drop-shadow">
+            <h1 className="text-center text-2xl font-bold">Produtos</h1>
             {shoppingCart.map((item) => (
               <CartItem key={item.orderId} item={item} />
             ))}
           </ul>
-          <div className="w-1/4 relative">
+          <div className="relative w-1/4">
             <CartTotal />
           </div>
         </div>
@@ -28,7 +28,7 @@ const ShoppingCartPage = () => {
         <div>
           <h2 className="text-xl">Seu carrinho está vazio</h2>
           <Link href="/">
-            <Button className="bg-orange-500 hover:bg-orange-600 mx-auto mt-2">
+            <Button className="mx-auto mt-2 bg-orange-500 hover:bg-orange-600">
               Ir para produtos
             </Button>
           </Link>
@@ -48,32 +48,23 @@ const CartItem: React.FC<{ item: IProductToShoppingCart }> = ({ item }) => {
   };
 
   return (
-    <li className="flex flex-col gap-2 p-2">
-      <div className="top flex items-center">
-        <div className="flex flex-col items-center">
-          <Image
-            alt={item.productName}
-            src={item.image}
-            width={100}
-            height={100}
-          />
-          <strong>
-            {item.productName} x{item.quantity}
-          </strong>
-        </div>
-        <div className="right-side flex flex-col gap-2">
-          <strong>Tamanho: {item.size}</strong>
-          <strong>
-            Preço total: R$ {(item.quantity * item.unitPrice).toFixed(2)}
-          </strong>
-        </div>
+    <li className="flex justify-between gap-2 p-2">
+      <div className="left-side flex">
+        <Image alt={item.productName} src={item.image} width={80} height={50} />
+        <strong>{item.productName}</strong>
       </div>
-      <Button
-        className="bg-red-500 hover:bg-red-800 gap-1"
-        onClick={() => handleRemoveItemFromCart()}
-      >
-        Remover <X className="mt-1" />
-      </Button>
+      <div className="right-side flex flex-col gap-2">
+        <strong>Tamanho: {item.size}</strong>
+        <strong>
+          Preço total: R$ {(item.quantity * item.unitPrice).toFixed(2)}
+        </strong>
+        <Button
+          className="gap-1 bg-red-500 hover:bg-red-800"
+          onClick={() => handleRemoveItemFromCart()}
+        >
+          Remover <X className="mt-1" />
+        </Button>
+      </div>
     </li>
   );
 };
@@ -81,7 +72,7 @@ const CartItem: React.FC<{ item: IProductToShoppingCart }> = ({ item }) => {
 const CartTotal = () => {
   const [shoppingCart] = useAtom(shoppingCartAtom);
   return (
-    <div className="fixed h-80 w-96 flex flex-col bg-white rounded drop-shadow p-4">
+    <div className="fixed flex h-80 w-96 flex-col rounded bg-white p-4 drop-shadow">
       <h1>Resumo</h1>
       <p>
         Total: R${" "}
