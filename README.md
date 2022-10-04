@@ -11,15 +11,11 @@
 
 ### How to run:
 
-1. Clone the repository
-
-`git clone https://github.com/greidinger-reis/frontendchallenge-ecommerce`
-
-2. Install dependencies
+1. Install dependencies
    
 `npm i`
 
-3. Run the project
+2. Run the project
  
 `npm run dev`
 
